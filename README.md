@@ -26,7 +26,7 @@ This project was built for a school project my senior year of high school. It is
 8) Every horizontal grid row must be terminated by a newline ("\n") character, 
 and can be terminated by a carraige return ("\r\n)
 ```
-<img align="right" width="300" height="280" alt="Screenshot 2026-10-01 at 00 42 10" src="https://github.com/user-attachments/assets/b1fd4efc-9aa6-4365-9120-cb6a6bacf467" />
+<img align="right" width="300" alt="Screenshot 2026-10-01 at 00 42 10" src="https://github.com/user-attachments/assets/b1fd4efc-9aa6-4365-9120-cb6a6bacf467" />
 
 ```
 Example:
