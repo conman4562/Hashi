@@ -1249,7 +1249,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
 		if (!currentIsSolved) {
 			islands = islandsCopy;
 			board = boardCopy;
-			nonDeterministicSolver(n + 1);
+			return nonDeterministicSolver(n + 1);
 		}
 		return true;
 	}
