@@ -1,5 +1,4 @@
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,9 +11,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
+import javax.swing.*;
 
-@SuppressWarnings("serial")
 public class HashiDriver extends JFrame {
 
 	public static void main(String[] args) throws IOException {
@@ -25,15 +23,15 @@ public class HashiDriver extends JFrame {
 		//jFrame.setResizable(false);
 		//jFrame.setUndecorated(true);
 		jFrame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-		jFrame.setDefaultCloseOperation(3);
+		jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		jFrame.setTitle("Connor's Hashi Puzzle");
 		jFrame.setMinimumSize(new Dimension(800, 700));
 		try {
       byte[] imageBytes = Base64.getDecoder().decode(b64_image);
       BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
       jFrame.setIconImage(image);
-			} catch (Exception ex) {
-      ex.printStackTrace();
+			} catch (Exception _) {
+
       
 		}
 		
@@ -58,7 +56,7 @@ public class HashiDriver extends JFrame {
 	
 	public static List<String> txtToList(String fileOriginPath) throws FileNotFoundException {
 		// scan down each line in the file
-		List<String> data = new ArrayList<String>();
+		List<String> data = new ArrayList<>();
 		Scanner fileScanner = new Scanner(new File(fileOriginPath));
 		while(fileScanner.hasNextLine()) {
 			data.add(fileScanner.nextLine());

@@ -12,7 +12,7 @@ public class Island {
 		this.row = row;
 		this.col = col;
 		this.value = value;
-		nb = new HashMap<Island, Integer>();
+		nb = new HashMap<>();
 	}
 	
 	public int totalNeighborValue() {

@@ -963,7 +963,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
       }
 			break;
 		case 5: // check solution
-			if (solving) {
+			if (solving && !solvedMessage) {
 				break;
 			}
 			unsolvedIslands = new ArrayList<Island>();
