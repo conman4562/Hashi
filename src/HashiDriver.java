@@ -49,8 +49,6 @@ public class HashiDriver extends JFrame {
         Hashi jPanel = new Hashi(Arrays.asList(stuff));
         jFrame.add(jPanel);
         jFrame.setVisible(true);
-
-        jFrame.repaint();
     }
 
     public static List<String> txtToList(String fileOriginPath) throws FileNotFoundException {

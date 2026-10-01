@@ -6,13 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -21,11 +15,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -36,6 +28,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
+    private static final Logger logger = Logger.getLogger(Hashi.class.getName());
 
     public HashSet<Island> islands;
     public HashSet<Island> islandsCopy;
@@ -69,6 +62,15 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
     static Color BAD_COLOR = new Color(105, 11, 34);
     static Color BOARD_BG_COLOR = new Color(222, 222, 222);
     static Color BG_COLOR = new Color(236, 223, 204);
+    static final Color GROUP_COLOR = new Color(18, 52, 88);
+    // created once instead of on every paint
+    static final BasicStroke STROKE_3 = new BasicStroke(3);
+    static final BasicStroke STROKE_5 = new BasicStroke(5);
+    static final Font ISLAND_FONT = new Font("Arial", Font.PLAIN, 40);
+    static final Font MESSAGE_FONT = new Font("Arial", Font.BOLD, 50);
+    static final Font TITLE_FONT = new Font("Times New Roman", Font.BOLD, 100);
+    static final Font TEXT_FONT = new Font("Arial", Font.PLAIN, 20);
+    static final Font TEXT_BOLD_FONT = new Font("Arial", Font.BOLD, 20);
     // caved and used a 2d array. can't see a better way to detect for lines crossing.
     public char[][] board;
     public char[][] boardCopy;
@@ -231,7 +233,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         for (Island island : islands) {
 
             for (Island tempIsland : island.nb.keySet()) {
-                gNew.setStroke(new BasicStroke(5));
+                gNew.setStroke(STROKE_5);
                 if (island.nb.get(tempIsland) == 2) {
                     gNew.drawLine(15 + (island.col - board[0].length / 2) * spacing, 15 + (island.row - board.length / 2) * spacing, 15 + (tempIsland.col - board[0].length / 2) * spacing, 15 + (tempIsland.row - board.length / 2) * spacing);
                     gNew.drawLine(35 + (island.col - board[0].length / 2) * spacing, 35 + (island.row - board.length / 2) * spacing, 35 + (tempIsland.col - board[0].length / 2) * spacing, 35 + (tempIsland.row - board.length / 2) * spacing);
@@ -249,7 +251,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             }
             gNew.fillOval((island.col - board[0].length / 2) * spacing, (island.row - board.length / 2) * spacing, 50, 50);
             gNew.setColor(Color.WHITE);
-            gNew.setFont(new Font("Arial", Font.PLAIN, 40));
+            gNew.setFont(ISLAND_FONT);
             gNew.drawString("" + island.value, 14 + (island.col - board[0].length / 2) * spacing, 39 + (island.row - board.length / 2) * spacing);
             if (!instructions && !solving && (island.equals(currentSelected0) || island.equals(currentSelected2))) {
                 gNew.drawOval((island.col - board[0].length / 2) * spacing, (island.row - board.length / 2) * spacing, 50, 50);
@@ -285,13 +287,13 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                         //s
                         //w
                     }
-                    gNew.setStroke(new BasicStroke(5));
-                    gNew.setColor(new Color(18, 52, 88));
+                    gNew.setStroke(STROKE_5);
+                    gNew.setColor(GROUP_COLOR);
                     gNew.draw(groupArea);
                 }
             }
-            gNew.setStroke(new BasicStroke(5));
-            g2d.setStroke(new BasicStroke(5));
+            gNew.setStroke(STROKE_5);
+            g2d.setStroke(STROKE_5);
             for (Island unsolvedIsland : unsolvedIslands) {
                 gNew.setColor(BAD_COLOR);
                 gNew.drawOval((unsolvedIsland.col - board[0].length / 2) * spacing - 5, (unsolvedIsland.row - board.length / 2) * spacing - 5, 60, 60);
@@ -302,31 +304,31 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.setColor(Color.BLACK);
             g2d.draw(roundedRect);
             g2d.setColor(BAD_COLOR);
-            g2d.setFont(new Font("Arial", Font.BOLD, 50));
+            g2d.setFont(MESSAGE_FONT);
             g2d.drawString("NOT SOLVED", 85, 200);
 
         }
         if (solvedMessage && !solving) {
-            g2d.setStroke(new BasicStroke(5));
+            g2d.setStroke(STROKE_5);
             g2d.setColor(Color.WHITE);
             RoundRectangle2D roundedRect = new RoundRectangle2D.Double(80, 150, 215, 60, 10, 10);
             g2d.fill(roundedRect);
             g2d.setColor(Color.BLACK);
             g2d.draw(roundedRect);
             g2d.setColor(GOOD_COLOR);
-            g2d.setFont(new Font("Arial", Font.BOLD, 50));
+            g2d.setFont(MESSAGE_FONT);
             g2d.drawString("SOLVED", 85, 200);
         }
 
         if (unSolvableMessage) {
-            g2d.setStroke(new BasicStroke(5));
+            g2d.setStroke(STROKE_5);
             g2d.setColor(Color.WHITE);
             RoundRectangle2D roundedRect = new RoundRectangle2D.Double(80, 150, 352, 60, 10, 10);
             g2d.fill(roundedRect);
             g2d.setColor(Color.BLACK);
             g2d.draw(roundedRect);
             g2d.setColor(BAD_COLOR);
-            g2d.setFont(new Font("Arial", Font.BOLD, 50));
+            g2d.setFont(MESSAGE_FONT);
             g2d.drawString("UNSOLVABLE", 85, 200);
         }
 
@@ -337,7 +339,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         area.subtract(new Area(roundedRect));
         g2d.setColor(BG_COLOR);
         g2d.fill(area);
-        g2d.setStroke(new BasicStroke(5));
+        g2d.setStroke(STROKE_5);
         g2d.setColor(Color.BLACK);
         g2d.drawRoundRect(50, 125, roundedRectWidth, roundedRectHeight, 100, 100);
         // buttons
@@ -359,9 +361,8 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
 
         // title
         g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("Times New Roman", Font.BOLD, 100));
+        g2d.setFont(TITLE_FONT);
         g2d.drawString("Hashi Puzzle", 50, 100);
-        repaint();
 
         if (instructions) {
 //			int lineSpacing = 20;
@@ -416,23 +417,23 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             int xStart = 300;
 
             // Prepare drawing context.
-            g2d.setStroke(new BasicStroke(3));
+            g2d.setStroke(STROKE_3);
             g2d.setColor(Color.WHITE);
             g2d.fillRect(xStart, 200, 800, 700);
             g2d.setColor(Color.BLACK);
             g2d.drawRect(xStart, 200, 800, 700);
 
             // --- Title ---
-            g2d.setFont(new Font("Arial", Font.BOLD, 50));
+            g2d.setFont(MESSAGE_FONT);
             g2d.drawString("Instructions:", xStart + 10, currentPlace += lineSpacing);
 
             // --- Hashi Rules header ---
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.drawString("Hashi Rules:", xStart + 10, currentPlace += lineSpacing);
 
             // --- Rule 1 ---
             // "-The number on each island tells you how many bridges must be connected to it."
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             String rule1a = "-The number on each island tells you how many ";
             String rule1Highlight = "bridges";
             String rule1b = " must be connected to it.";
@@ -443,13 +444,13 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             int offset = fm.stringWidth(rule1a);
 
             // Draw highlighted part (in bold and colored).
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.MAGENTA);
             g2d.drawString(rule1Highlight, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(rule1Highlight);
 
             // Draw remaining text.
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(rule1b, xStart + 15 + offset, currentPlace);
 
@@ -466,25 +467,25 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             offset = fm.stringWidth(rule2a);
 
             // First highlighted word.
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.MAGENTA);
             g2d.drawString(rule2Highlight1, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(rule2Highlight1);
 
             // Draw middle plain text.
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(rule2Middle, xStart + 15 + offset, currentPlace);
             offset += fm.stringWidth(rule2Middle);
 
             // Second highlighted word.
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.MAGENTA);
             g2d.drawString(rule2Highlight2, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(rule2Highlight2);
 
             // Remainder of the line.
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(rule2b, xStart + 15 + offset, currentPlace);
 
@@ -498,21 +499,21 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.drawString(rule3a, xStart + 15, currentPlace += lineSpacing);
             offset = fm.stringWidth(rule3a);
 
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.MAGENTA);
             g2d.drawString(rule3Highlight, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(rule3Highlight);
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(rule3b, xStart + 15 + offset, currentPlace);
 
             currentPlace += 10; // Extra space between sections
 
             // --- General Info section ---
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.drawString("General info:", xStart + 10, currentPlace += lineSpacing);
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
 
             // Example Info line: "-Connect 2 islands with a bridge by dragging from one to another."
             String info1a = "-Connect 2 islands with a ";
@@ -523,12 +524,12 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.drawString(info1a, xStart + 15, currentPlace += lineSpacing);
             offset = fm.stringWidth(info1a);
 
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.MAGENTA);
             g2d.drawString(info1Highlight, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(info1Highlight);
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(info1b, xStart + 15 + offset, currentPlace);
 
@@ -541,12 +542,12 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.drawString(info2a, xStart + 15, currentPlace += lineSpacing);
             offset = fm.stringWidth(info2a);
 
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.GREEN);
             g2d.drawString(info2Highlight, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(info2Highlight);
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(info2b, xStart + 15 + offset, currentPlace);
 
@@ -559,21 +560,21 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.drawString(info3a, xStart + 15, currentPlace += lineSpacing);
             offset = fm.stringWidth(info3a);
 
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.RED);
             g2d.drawString(info3Highlight, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(info3Highlight);
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(info3b, xStart + 15 + offset, currentPlace);
 
             currentPlace += 10; // Extra space
 
             // --- Controls section ---
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.drawString("Controls:", xStart + 10, currentPlace += lineSpacing);
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
 
             // Control instruction: "-Press 'ESC' to close the program."
             String ctrl1a = "-Press '";
@@ -584,12 +585,12 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.drawString(ctrl1a, xStart + 15, currentPlace += lineSpacing);
             offset = fm.stringWidth(ctrl1a);
 
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.BLUE);
             g2d.drawString(ctrl1Highlight, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(ctrl1Highlight);
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(ctrl1b, xStart + 15 + offset, currentPlace);
 
@@ -601,9 +602,9 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             currentPlace += 10; // Extra space
 
             // --- Buttons section ---
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.drawString("Buttons:", xStart + 10, currentPlace += lineSpacing);
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
 
             // Button: -Instructions: Opens and closes this menu.
             g2d.drawString("-Instructions: Opens and closes this menu.", xStart + 15, currentPlace += lineSpacing);
@@ -617,12 +618,12 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.drawString(btn2a, xStart + 15, currentPlace += lineSpacing);
             offset = fm.stringWidth(btn2a);
 
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.BLUE);
             g2d.drawString(btn2Highlight, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(btn2Highlight);
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(btn2b, xStart + 15 + offset, currentPlace);
 
@@ -647,12 +648,12 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.drawString(btn7a, xStart + 15, currentPlace += lineSpacing);
             offset = fm.stringWidth(btn7a);
 
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.setFont(TEXT_BOLD_FONT);
             g2d.setColor(Color.BLUE);
             g2d.drawString(btn7Highlight, xStart + 15 + offset, currentPlace);
             offset += g2d.getFontMetrics().stringWidth(btn7Highlight);
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2d.setFont(TEXT_FONT);
             g2d.setColor(Color.BLACK);
             g2d.drawString(btn7b, xStart + 15 + offset, currentPlace);
 
@@ -755,6 +756,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             tempRow += vIncrement;
             tempCol += hIncrement;
         }
+        repaint();
     }
 
     @Override
@@ -773,6 +775,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                 spacing = 70;
             }
         }
+        repaint();
     }
 
     @Override
@@ -788,8 +791,8 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         boolean selected = false;
         for (Island is : islands) {
             // if distance < radius (25) from center changed to 30 for more leniency
-            double cx = x + (is.col - (double) board[0].length / 2) * spacing + 25;
-            double cy = y + (is.row - (double) board.length / 2) * spacing + 25;
+            int cx = x + (is.col - board[0].length / 2) * spacing + 25;
+            int cy = y + (is.row - board.length / 2) * spacing + 25;
             double dist = Math.sqrt((e.getX() - cx) * (e.getX() - cx) + (e.getY() - cy) * (e.getY() - cy));
             if (dist < 30) {
                 selected = true;
@@ -799,6 +802,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         if (!selected) {
             currentSelected2 = null;
         }
+        repaint();
     }
 
     @Override
@@ -808,8 +812,8 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         boolean selected = false;
         for (Island is : islands) {
             // if distance < radius (25) from center changed to 30 for more leniency
-            double cx = x + (is.col - (double) board[0].length / 2) * spacing + 25;
-            double cy = y + (is.row - (double) board.length / 2) * spacing + 25;
+            int cx = x + (is.col - board[0].length / 2) * spacing + 25;
+            int cy = y + (is.row - board.length / 2) * spacing + 25;
             double dist = Math.sqrt((e.getX() - cx) * (e.getX() - cx) + (e.getY() - cy) * (e.getY() - cy));
             if (dist < 30) {
                 selected = true;
@@ -825,6 +829,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         for (Button button : buttons) {
             button.hovering = e.getX() > button.x && e.getY() > button.y && e.getX() < button.x + button.width && e.getY() < button.y + button.height;
         }
+        repaint();
     }
 
     public void buttonClicked(int buttonID) {
@@ -875,7 +880,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     SwingUtilities.updateComponentTreeUI(fileChooser);
                 } catch (Exception e) {
-                    System.err.println(e);
+                    logger.log(Level.WARNING, "Error making filechooser look windows-ey: ", e);
                 }
 
                 //start user selection in downloads folder
@@ -894,7 +899,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                     try {
                         stuff = HashiDriver.txtToList(selectedFile.getAbsolutePath());
                     } catch (FileNotFoundException e) {
-                        e.printStackTrace();
+                        logger.log(Level.WARNING, "File not found: ", e);
                     }
                     if (stuff != null) {
                         init(stuff);
@@ -908,7 +913,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     SwingUtilities.updateComponentTreeUI(fileChooser2);
                 } catch (Exception e) {
-                    System.err.println(e);
+                    logger.log(Level.WARNING, "Error making filechooser look windows-ey: ", e);
                 }
                 // only write to txt file
                 FileNameExtensionFilter filter2 = new FileNameExtensionFilter("Text Files", "txt");
@@ -934,7 +939,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                         }
                         JOptionPane.showMessageDialog(this, "File saved successfully at: \n" + fileToSave.getAbsolutePath());
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+                        logger.log(Level.WARNING, "Error saving file: ", ex);
                         JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -1053,10 +1058,12 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                             try {
                                 Thread.sleep(2500);
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                Thread.currentThread().interrupt(); // restore the flag
+                                return;
                             }
                             //System.out.println("Here2");
                             notSolvedMessage = false;
+                            repaint();
                         });
                         t.start();
                     }
@@ -1068,12 +1075,14 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                         Thread t = new Thread(() -> {
                             //System.out.println("Here1");
                             try {
-                                Thread.sleep(1);
+                                Thread.sleep(2500);
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                Thread.currentThread().interrupt(); // restore the flag
+                                return;
                             }
                             //System.out.println("Here2");
                             solvedMessage = false;
+                            repaint();
                         });
                         t.start();
                     }
@@ -1114,6 +1123,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                 animationSpeed = 0;
                 break;
         }
+        repaint();
 
 
     }
@@ -1125,12 +1135,15 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                 return;
             }
             unSolvableMessage = !solvable;
+            repaint();
             try {
                 Thread.sleep(2500);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
+                return;
             }
             unSolvableMessage = false;
+            repaint();
         });
         return new Thread(() -> {
             deterministicSolver();
@@ -1140,6 +1153,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             solvable = nonDeterministicSolver(0);
 // System.out.println(solvable);
             solving = false;
+            repaint();
             if (!unSolvableMessage) {
                 t2.start();
             }
@@ -1188,7 +1202,8 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                                 try {
                                     Thread.sleep(0);
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    Thread.currentThread().interrupt(); // restore the flag
+                                    return false;
                                 }
                             }
 
@@ -1196,7 +1211,8 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                             try {
                                 Thread.sleep((long) (ANIMATION_TIME * animationSpeed));
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                Thread.currentThread().interrupt(); // restore the flag
+                                return false;
                             }
                         }
                     }
@@ -1211,6 +1227,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         if (!currentIsSolved) {
             islands = islandsCopy;
             board = boardCopy;
+            repaint();
             return nonDeterministicSolver(n + 1);
         }
         return true;
@@ -1255,27 +1272,31 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                                                 try {
                                                     Thread.sleep(0);
                                                 } catch (InterruptedException e) {
-                                                    e.printStackTrace();
+                                                    Thread.currentThread().interrupt(); // restore the flag
+                                                    return;
                                                 }
                                             }
                                             drag(is, temp);
                                             try {
                                                 Thread.sleep((long) (ANIMATION_TIME * animationSpeed));
                                             } catch (InterruptedException e) {
-                                                e.printStackTrace();
+                                                Thread.currentThread().interrupt(); // restore the flag
+                                                return;
                                             }
                                             while (concurrentModificationErrorFix) {
                                                 try {
                                                     Thread.sleep(0);
                                                 } catch (InterruptedException e) {
-                                                    e.printStackTrace();
+                                                    Thread.currentThread().interrupt(); // restore the flag
+                                                    return;
                                                 }
                                             }
                                             drag(is, temp);
                                             try {
                                                 Thread.sleep((long) (ANIMATION_TIME * animationSpeed));
                                             } catch (InterruptedException e) {
-                                                e.printStackTrace();
+                                                Thread.currentThread().interrupt(); // restore the flag
+                                                return;
                                             }
                                         }
                                     }
@@ -1288,14 +1309,16 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                                                 try {
                                                     Thread.sleep(0);
                                                 } catch (InterruptedException e) {
-                                                    e.printStackTrace();
+                                                    Thread.currentThread().interrupt(); // restore the flag
+                                                    return;
                                                 }
                                             }
                                             drag(is, temp);
                                             try {
                                                 Thread.sleep((long) (ANIMATION_TIME * animationSpeed));
                                             } catch (InterruptedException e) {
-                                                e.printStackTrace();
+                                                Thread.currentThread().interrupt(); // restore the flag
+                                                return;
                                             }
                                         }
                                     }
@@ -1332,7 +1355,8 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                         try {
                             Thread.sleep(1);
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            Thread.currentThread().interrupt(); // restore the flag
+                            return;
                         }
                         for (Island nb : validNb) {
                             if (nb == null) {
@@ -1356,27 +1380,31 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                                             try {
                                                 Thread.sleep(0);
                                             } catch (InterruptedException e) {
-                                                e.printStackTrace();
+                                                Thread.currentThread().interrupt(); // restore the flag
+                                                return;
                                             }
                                         }
                                         drag(is, temp);
                                         try {
                                             Thread.sleep((long) (ANIMATION_TIME * animationSpeed));
                                         } catch (InterruptedException e) {
-                                            e.printStackTrace();
+                                            Thread.currentThread().interrupt(); // restore the flag
+                                            return;
                                         }
                                         while (concurrentModificationErrorFix) {
                                             try {
                                                 Thread.sleep(0);
                                             } catch (InterruptedException e) {
-                                                e.printStackTrace();
+                                                Thread.currentThread().interrupt(); // restore the flag
+                                                return;
                                             }
                                         }
                                         drag(is, temp);
                                         try {
                                             Thread.sleep((long) (ANIMATION_TIME * animationSpeed));
                                         } catch (InterruptedException e) {
-                                            e.printStackTrace();
+                                            Thread.currentThread().interrupt(); // restore the flag
+                                            return;
                                         }
 
                                     }
@@ -1388,14 +1416,16 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                                             try {
                                                 Thread.sleep(0);
                                             } catch (InterruptedException e) {
-                                                e.printStackTrace();
+                                                Thread.currentThread().interrupt(); // restore the flag
+                                                return;
                                             }
                                         }
                                         drag(is, temp);
                                         try {
                                             Thread.sleep((long) (ANIMATION_TIME * animationSpeed));
                                         } catch (InterruptedException e) {
-                                            e.printStackTrace();
+                                            Thread.currentThread().interrupt(); // restore the flag
+                                            return;
                                         }
                                     }
                                 }
@@ -1416,7 +1446,8 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                                         try {
                                             Thread.sleep((long) (ANIMATION_TIME * animationSpeed));
                                         } catch (InterruptedException e) {
-                                            e.printStackTrace();
+                                            Thread.currentThread().interrupt(); // restore the flag
+                                            return;
                                         }
                                     }
                                 }
@@ -1483,8 +1514,8 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         boolean selected = false;
         for (Island is : islands) {
             // if distance < radius (25) from center changed to 30 for more leniency
-            double cx = x + (is.col - (double) board[0].length / 2) * spacing + 25;
-            double cy = y + (is.row - (double) board.length / 2) * spacing + 25;
+            int cx = x + (is.col - board[0].length / 2) * spacing + 25;
+            int cy = y + (is.row - board.length / 2) * spacing + 25;
             double dist = Math.sqrt((e.getX() - cx) * (e.getX() - cx) + (e.getY() - cy) * (e.getY() - cy));
             if (dist < 30) {
                 currentSelected0 = is;
@@ -1494,6 +1525,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         if (!selected) {
             currentSelected0 = null;
         }
+        repaint();
     }
 
     @Override
@@ -1501,10 +1533,10 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         boolean selected = false;
         for (Island is : islands) {
             // if distance < radius (25) from center
-            double cx = x + (is.col - (double) board[0].length / 2) * spacing + 25;
-            double cy = y + (is.row - (double) board.length / 2) * spacing + 25;
+            int cx = x + (is.col - board[0].length / 2) * spacing + 25;
+            int cy = y + (is.row - board.length / 2) * spacing + 25;
             double dist = Math.sqrt((e.getX() - cx) * (e.getX() - cx) + (e.getY() - cy) * (e.getY() - cy));
-            if (dist < 25) {
+            if (dist < 30) {
                 currentSelected1 = is;
                 selected = true;
             }
@@ -1535,6 +1567,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         currentSelected1 = null;
         mx = e.getX();
         my = e.getY();
+        repaint();
     }
 
     @Override
@@ -1554,6 +1587,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         int width;
         int height;
         int font;
+        Font textFont;
         int fillet;
         String message;
         boolean hovering;
@@ -1568,6 +1602,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             this.width = width;
             this.height = height;
             this.font = font;
+            this.textFont = new Font("Arial", Font.PLAIN, font);
             this.fillet = fillet;
             this.message = message;
             x = getWidth() - xOffset;
@@ -1579,7 +1614,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             x = getWidth() - xOffset;
             rrectArea = new Area(new RoundRectangle2D.Double(x, y, width, height, fillet, fillet));
-            g2d.setStroke(new BasicStroke(5));
+            g2d.setStroke(STROKE_5);
             if (hovering) {
                 g2d.setColor(hoverColor);
             } else {
@@ -1590,7 +1625,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.setColor(Color.BLACK);
             g2d.draw(rrectArea);
             g2d.setColor(Color.BLACK);
-            g2d.setFont(new Font("Arial", Font.PLAIN, font));
+            g2d.setFont(textFont);
             g2d.drawString(message, x + width / 10, y + height / 2 + font / 3);
         }
     }
