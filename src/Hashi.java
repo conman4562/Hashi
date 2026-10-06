@@ -63,7 +63,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
     static Color BOARD_BG_COLOR = new Color(222, 222, 222);
     static Color BG_COLOR = new Color(236, 223, 204);
     static final Color GROUP_COLOR = new Color(18, 52, 88);
-    // created once instead of on every paint
+
     static final BasicStroke STROKE_3 = new BasicStroke(3);
     static final BasicStroke STROKE_5 = new BasicStroke(5);
     static final Font ISLAND_FONT = new Font("Arial", Font.PLAIN, 40);
@@ -1503,7 +1503,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
     @Override
     public void mouseClicked(MouseEvent e) {
         for (int i = 0; i < buttons.size(); i++) {
-            if (e.getX() > buttons.get(i).x && e.getY() > buttons.get(i).y && e.getX() < buttons.get(i).x + buttons.get(i).width && e.getY() < buttons.get(i).y + buttons.get(i).height) {
+            if (buttons.get(i).rrectArea.contains(e.getPoint())) {
                 buttonClicked(i);
             }
         }
