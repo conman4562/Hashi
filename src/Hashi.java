@@ -83,18 +83,19 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         currentSelected1 = null;
         currentSelected2 = null;
         buttons = new ArrayList<>();
-        buttons.add(new Button(300, 125, 200, 50, 20, 40, "Instructions (I)"));
-        buttons.add(new Button(300, 195, 200, 50, 20, 40, "Re-Center (R)"));
-        buttons.add(new Button(300, 265, 200, 50, 20, 40, "Clear Bridges (C)"));
-        buttons.add(new Button(300, 335, 200, 50, 20, 40, "Import (J)"));
-        buttons.add(new Button(300, 405, 200, 50, 20, 40, "Export (E)"));
-        buttons.add(new Button(300, 475, 200, 50, 20, 40, "Check Solution (V)"));
-        buttons.add(new Button(300, 545, 200, 50, 20, 40, "Solve Puzzle (S)"));
-        buttons.add(new Button(400, 265, 90, 50, 20, 40, "Undo (Z)"));
-        buttons.add(new Button(400, 615, 100, 50, 20, 40, "Slow"));
-        buttons.add(new Button(300, 615, 100, 50, 20, 40, "Med"));
-        buttons.add(new Button(200, 615, 100, 50, 20, 40, "Fast"));
-        buttons.add(new Button(100, 615, 100, 50, 20, 40, "Instant"));
+        int ybutton = 125;
+        buttons.add(new Button(300, ybutton, 200, 50, 20, 40, "Instructions (I)"));
+        buttons.add(new Button(300, ybutton += 70, 200, 50, 20, 40, "Re-Center (R)"));
+        buttons.add(new Button(300, ybutton += 70, 200, 50, 20, 40, "Clear Bridges (C)"));
+        buttons.add(new Button(300, ybutton += 70, 200, 50, 20, 40, "Import (J)"));
+        buttons.add(new Button(300, ybutton += 70, 200, 50, 20, 40, "Export (E)"));
+        buttons.add(new Button(300, ybutton += 70, 200, 50, 20, 40, "Check Solution (V)"));
+        buttons.add(new Button(300, ybutton += 70, 200, 50, 20, 40, "Solve Puzzle (S)"));
+        buttons.add(new Button(400, buttons.get(2).y, 90, 50, 20, 40, "Undo (Z)"));
+        buttons.add(new Button(400, ybutton += 70, 100, 50, 20, 40, "Slow"));
+        buttons.add(new Button(300, buttons.get(8).y, 100, 50, 20, 40, "Med"));
+        buttons.add(new Button(200, buttons.get(8).y, 100, 50, 20, 40, "Fast"));
+        buttons.add(new Button(100, buttons.get(8).y, 100, 50, 20, 40, "Instant"));
         setFocusable(true);
         addKeyListener(this);
         addMouseMotionListener(this);
@@ -216,12 +217,12 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         Graphics2D gNew = (Graphics2D) g.create();
 
         int roundedRectWidth = Math.max(getWidth() - 500, 300);
-        int roundedRectHeight = Math.max(getHeight() - 180, 100);
+        int roundedRectHeight = Math.max(getHeight() - 180, 100) + (getHeight() < 700 ? 100 : 0);
 
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, getWidth(), getHeight());
         g2d.setColor(BOARD_BG_COLOR);
-        g2d.fillRoundRect(50, 125, roundedRectWidth, roundedRectHeight, 100, 100);
+        g2d.fillRoundRect(50, 125 - (getHeight() < 700 ? 100 : 0), roundedRectWidth, roundedRectHeight, 100, 100);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         gNew.translate(x, y);
@@ -335,13 +336,13 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         // outer 2drect
         Rectangle2D full = new Rectangle2D.Double(-100, -100, 100 + getWidth(), 100 + getHeight());
         Area area = new Area(full);
-        RoundRectangle2D roundedRect = new RoundRectangle2D.Double(50, 125, roundedRectWidth, roundedRectHeight, 100, 100);
+        RoundRectangle2D roundedRect = new RoundRectangle2D.Double(50, 125 - (getHeight() < 700 ? 100 : 0), roundedRectWidth, roundedRectHeight, 100, 100);
         area.subtract(new Area(roundedRect));
         g2d.setColor(BG_COLOR);
         g2d.fill(area);
         g2d.setStroke(STROKE_5);
         g2d.setColor(Color.BLACK);
-        g2d.drawRoundRect(50, 125, roundedRectWidth, roundedRectHeight, 100, 100);
+        g2d.drawRoundRect(50, 125 - (getHeight() < 700 ? 100 : 0), roundedRectWidth, roundedRectHeight, 100, 100);
         // buttons
         for (int i = 0; i < buttons.size(); i++) {
             if (i >= 8 && i <= 11) {
@@ -358,11 +359,12 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
                 }
             }
         }
-
         // title
-        g2d.setColor(Color.BLACK);
-        g2d.setFont(TITLE_FONT);
-        g2d.drawString("Hashi Puzzle", 50, 100);
+        if (getHeight() >= 700) {
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(TITLE_FONT);
+            g2d.drawString("Hashi Puzzle", 50, 100);
+        }
 
         if (instructions) {
 //			int lineSpacing = 20;
@@ -414,7 +416,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             // i used chatgpt to reformat the stuff in the instructions :)
             int lineSpacing = 20;
             int currentPlace = 230;
-            int xStart = 300;
+            int xStart = Math.min(300, getWidth() / 5);
 
             // Prepare drawing context.
             g2d.setStroke(STROKE_3);
@@ -1594,6 +1596,7 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         Area rrectArea;
         Color normalColor = new Color(255, 255, 255);
         Color hoverColor = new Color(200, 200, 200);
+        boolean titleHidden;
 
         public Button(int xOffset, int y, int width, int height, int font, int fillet, String message) {
             super();
@@ -1610,6 +1613,10 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
         }
 
         public void drawButton(Graphics g) {
+            if (getHeight() < 700 && !titleHidden) {
+                y = y - 100;
+                titleHidden = true;
+            }
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             x = getWidth() - xOffset;
@@ -1627,6 +1634,11 @@ public class Hashi extends JPanel implements KeyListener, MouseListener, MouseMo
             g2d.setColor(Color.BLACK);
             g2d.setFont(textFont);
             g2d.drawString(message, x + width / 10, y + height / 2 + font / 3);
+            if (getHeight() >= 700 && titleHidden) {
+                y = y + 100;
+                titleHidden = false;
+                repaint();
+            }
         }
     }
 

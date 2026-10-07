@@ -24,7 +24,7 @@ public class HashiDriver extends JFrame {
         jFrame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         jFrame.setTitle("Connor's Hashi Puzzle");
-        jFrame.setMinimumSize(new Dimension(800, 700));
+        jFrame.setMinimumSize(new Dimension(800, 600));
         try {
             byte[] imageBytes = Base64.getDecoder().decode(b64_image);
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
